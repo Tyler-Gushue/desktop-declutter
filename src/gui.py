@@ -106,8 +106,7 @@ def start_declutter():
           log_message("Please select a folder first!")
           return
 
-     scan_and_clean(folder_selected)
-     log_message("Finished scanning!")
+     scan_and_clean(folder_selected, log_message)
 
 
 
