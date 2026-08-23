@@ -153,14 +153,10 @@ def log_message(message: str):
     msg_box.see(END)                    
     msg_box.config(state="disabled")
 
-
-
 # Set initial message and lock the box
 
 log_message("Select a folder to get started")
 
-
 # Keeps window opened
 
 window.mainloop() 
-
