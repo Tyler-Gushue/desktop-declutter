@@ -48,16 +48,16 @@ The following features are actively in development:
    ```bash
    git clone [https://github.com/your-username/desktop-declutter.git](https://github.com/your-username/desktop-declutter.git)
    cd desktop-declutter
-2. **Rune the applicatoin:
+2. **Rune the applicatoin:**
    ```bash
    python gui.py
 
 ### Project Structure
-
-desktop-declutter/
-├── src/
-│   ├── cleaner.py      # Core file scanning, categorization, and filesystem movement logic
-│   ├── gui.py          # Tkinter UI layout, event loop, and live logging console
-│   └── Logo.png        # Application window and taskbar icon
-├── .gitignore          # Git ignore file (excludes __pycache__, build artifacts, etc.)
-└── README.md           # Project documentation and roadmap
+    ```plaintext
+    desktop-declutter/
+    ├── src/
+    │   ├── cleaner.py      # Core file scanning, categorization, and filesystem movement logic
+    │   ├── gui.py          # Tkinter UI layout, event loop, and live logging console
+    │   └── Logo.png        # Application window and taskbar icon
+    ├── .gitignore          # Git ignore file (excludes __pycache__, build artifacts, etc.)
+    └── README.md           # Project documentation and roadmap
