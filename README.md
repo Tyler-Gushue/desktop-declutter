@@ -53,7 +53,6 @@ The following features are actively in development:
    python gui.py
 
 ### Project Structure
-    ```plaintext
     desktop-declutter/
     ├── src/
     │   ├── cleaner.py      # Core file scanning, categorization, and filesystem movement logic
