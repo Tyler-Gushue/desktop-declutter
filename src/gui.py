@@ -106,7 +106,7 @@ def start_declutter():
           log_message("Please select a folder first!")
           return
 
-     scan_and_clean(folder_selected, delete_empty_var.get(), log_message)
+     scan_and_clean(folder_selected, delete_empty_var.get(), delete_only_var.get(), log_message)
 
 
 
@@ -149,6 +149,33 @@ options_label = Label(
 
 )
 options_label.pack(pady=20)
+
+# Delete only mode section
+
+delete_only_var = BooleanVar(value=False)
+
+def on_toggle():
+     log_message(f"Delete only mode was set to: {delete_only_var.get()}")
+
+delete_only_check = Checkbutton(
+
+    options_frame,
+    text="Delete Only Mode",
+    bg=PRIMARY,
+    fg=BG,
+    activebackground=ACCENT,
+    selectcolor=ACCENT,
+    variable=delete_only_var,
+    command=on_toggle,
+    cursor="hand2",
+    relief="flat",
+    anchor="w",       
+    padx=10,
+    pady=5,
+
+)
+
+delete_only_check.pack(side=TOP, fill="x")
 
 # Delete empty folders section
 
