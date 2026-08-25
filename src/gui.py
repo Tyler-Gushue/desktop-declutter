@@ -106,7 +106,7 @@ def start_declutter():
           log_message("Please select a folder first!")
           return
 
-     scan_and_clean(folder_selected, log_message)
+     scan_and_clean(folder_selected, delete_empty_var.get(), log_message)
 
 
 
@@ -173,6 +173,7 @@ delete_empty_check = Checkbutton(
      pady=5,
 
 )
+
 delete_empty_check.pack(side=TOP)
 
 # message box section
