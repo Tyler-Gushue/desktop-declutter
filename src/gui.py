@@ -75,9 +75,9 @@ btn = Button(
      row_frame,
      text="Select Folder",
      command=choose_folder,
-     bg=ACCENT,
+     bg=PRIMARY,
      fg="white",
-     activebackground=PRIMARY,
+     activebackground=ACCENT,
      relief="flat",
      padx=12,
      pady=6,
@@ -106,7 +106,7 @@ def start_declutter():
           log_message("Please select a folder first!")
           return
 
-     scan_and_clean(folder_selected, log_message)
+     scan_and_clean(folder_selected, delete_empty_var.get(), log_message)
 
 
 
@@ -118,7 +118,7 @@ start_btn = Button(
      command=start_declutter,
      bg=PRIMARY,
      fg="white",
-     activebackground=PRIMARY,
+     activebackground=ACCENT,
      relief="flat",
      padx=20,
      pady=10,
@@ -128,11 +128,59 @@ start_btn = Button(
 
 start_btn.pack(fill="x", pady=20)
 
+# section for creating bottom frame
+
+bottom_frame = Frame(window)
+bottom_frame.pack(pady=20, fill="both", expand=True)
+
+# section for creating options frame
+
+options_frame = Frame(bottom_frame)
+options_frame.pack(side=LEFT, fill="y", pady=20)
+
+#section for options label
+
+options_label = Label(
+
+    options_frame,
+    text="Options",
+    font=("Arial Bold", 15),
+    fg=PRIMARY,
+
+)
+options_label.pack(pady=20)
+
+# Delete empty folders section
+
+delete_empty_var = BooleanVar(value=False)
+
+def on_toggle():
+     log_message(f"Delete empty folders was set to: {delete_empty_var.get()}")
+
+delete_empty_check = Checkbutton(
+
+     options_frame,
+     text="Delete Empty Folders",
+     bg=PRIMARY,
+     fg=BG,
+     activebackground=ACCENT,
+     selectcolor=ACCENT,
+     variable=delete_empty_var,
+     command=on_toggle,
+     cursor="hand2",
+     relief="flat",
+     padx=10,
+     pady=5,
+
+)
+
+delete_empty_check.pack(side=TOP)
+
 # message box section
 
 msg_box = scrolledtext.ScrolledText(
 
-     window,
+     bottom_frame,
      width=50,
      height=8,
      font=("Segoe UI", 9),
