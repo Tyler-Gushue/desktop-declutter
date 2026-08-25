@@ -7,7 +7,9 @@ A lightweight, modern Python desktop application built with Tkinter to automatic
 ## Features
 
 * **One-Click Organization:** Automatically scans top-level files in any selected directory and organizes them into categorized folders (Images, Documents, Media, Code, Archives, Installers, and Other).
-* **Live Action Console:** Embedded real-time log window displaying detailed file movements and scan summaries.
+* **Delete Only Mode:** Perform non-destructive scans or targeted removals (e.g., duplicate files, empty directories) without sorting files into subfolders.
+* **Empty Directory Cleanup:** Safely scans and prunes empty top-level directories post-operation.
+* **Live Action Console:** Embedded real-time log window displaying detailed file movements, skipped files, and operation summaries.
 * **Safety First:** Prevents overwriting duplicate filenames and gracefully skips active system directories.
 * **Modern UI:** Built with a clean, flat aesthetic and dedicated options sidebar.
 
@@ -17,7 +19,8 @@ A lightweight, modern Python desktop application built with Tkinter to automatic
 
 The following features are actively in development:
 
-* [ ] **Delete Empty Folders:** Post-scan cleanup to safely remove empty top-level subdirectories.
+* [x] **Delete Empty Folders:** Post-scan cleanup to safely remove empty top-level subdirectories.
+* [x] **Delete Only Mode:** Bypass category organization to execute targeted deletions and cleanup tasks.
 * [ ] **Custom Category & Extension Editor:** Profile manager saving custom folder rules and file mappings to `settings.json`.
 * [ ] **File Lock Handling:** Graceful error handling for permission-restricted and in-use files (`PermissionError`, `WinError 32`).
 * [ ] **Duplicate File Detection:** Byte-level content hashing (MD5/SHA-256) to identify and isolate duplicate files.
@@ -46,11 +49,11 @@ The following features are actively in development:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-username/desktop-declutter.git](https://github.com/your-username/desktop-declutter.git)
+   git clone [https://github.com/Tyler-Gushue/desktop-declutter.git](https://github.com/Tyler-Gushue/desktop-declutter.git)
    cd desktop-declutter
 2. **Rune the applicatoin:**
    ```bash
-   python gui.py
+   python src/gui.py
 
 ### Project Structure
     desktop-declutter/

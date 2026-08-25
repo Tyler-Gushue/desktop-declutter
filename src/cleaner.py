@@ -10,7 +10,7 @@ CATEGORIES = {
     "Code": [".py", ".html", ".css", ".js", ".json"]
 }
 
-def scan_and_clean(folder_path, delete_empty_var, log_func=print):
+def scan_and_clean(folder_path, delete_empty_var, delete_only_var, log_func=print):
 
     if not os.path.exists(folder_path):
 
@@ -19,71 +19,106 @@ def scan_and_clean(folder_path, delete_empty_var, log_func=print):
 
     log_func("...")
 
-    file_count = 0
+    item_count = 0
     moved_count = 0
-    folder_count = 0
     deleted_count = 0
 
     for item_name in os.listdir(folder_path):
 
         full_path = os.path.join(folder_path, item_name)
 
-        if os.path.isfile(full_path):
+        if not delete_only_var:
 
-            file_count += 1
+            item_count += 1
 
-            _, ext = os.path.splitext(item_name)
-            ext = ext.lower()
+            if os.path.isfile(full_path):
 
-            destination_category = "Other"
+                _, ext = os.path.splitext(item_name)
+                ext = ext.lower()
 
-            for category, extensions in CATEGORIES.items():
+                destination_category = "Other"
 
-                if ext in extensions:
+                for category, extensions in CATEGORIES.items():
 
-                    destination_category = category
-                    break
+                    if ext in extensions:
 
-            target_folder_path = os.path.join(folder_path, destination_category)
-            os.makedirs(target_folder_path, exist_ok=True)
+                        destination_category = category
+                        break
 
-            target_file_path = os.path.join(target_folder_path, item_name)
+                target_folder_path = os.path.join(folder_path, destination_category)
+                os.makedirs(target_folder_path, exist_ok=True)
 
-            if not os.path.exists(target_file_path):
+                target_file_path = os.path.join(target_folder_path, item_name)
 
-                shutil.move(full_path, target_file_path)
-                moved_count += 1
-                log_func(f"Moved: {item_name} -> {destination_category}/")
+                if not os.path.exists(target_file_path):
 
-            else:
+                    shutil.move(full_path, target_file_path)
+                    moved_count += 1
+                    log_func(f"Moved: {item_name} -> {destination_category}/")
 
-                log_func(f"Skipped duplicate: {item_name}")
+                else:
 
-        elif os.path.isdir(full_path):
+                    log_func(f"Skipped duplicate: {item_name}")
 
-            folder_count += 1
+            elif os.path.isdir(full_path):
 
-            if delete_empty_var:
+                item_count += 1
 
-                try:
+                if delete_empty_var:
 
-                    if not os.listdir(full_path):
+                    try:
 
-                        deleted_count += 1
-                        os.rmdir(full_path)
-                        log_func(f"Folder is empty.  Deleting Folder: {item_name}")
+                        if not os.listdir(full_path):
 
-                    else:
+                            deleted_count += 1
+                            os.rmdir(full_path)
+                            log_func(f"Folder is empty.  Deleting Folder: {item_name}")
 
-                        log_func(f"Folder isn't empty.  Skipping Folder: {item_name}")
+                        else:
 
-                except OSError as e:
+                            log_func(f"Folder isn't empty.  Skipping Folder: {item_name}")
 
-                    log_func(f"Could not delete folder {item_name}: {e}")
-                
-            else:
+                    except OSError as e:
 
-                log_func(f"Skipping folder: {item_name}")
+                        log_func(f"Could not delete folder {item_name}: {e}")
+                    
+                else:
+
+                    log_func(f"Skipping folder: {item_name}")
+                    
+        else:
+
+            item_count += 1
+
+            if os.path.isfile(full_path):
+
+                log_func(f"Skipping file: {item_name}")
+
+            elif os.path.isdir(full_path):
+
+                item_count += 1
+
+                if delete_empty_var:
+
+                    try:
+
+                        if not os.listdir(full_path):
+
+                            deleted_count += 1
+                            os.rmdir(full_path)
+                            log_func(f"Folder is empty.  Deleting Folder: {item_name}")
+
+                        else:
+
+                            log_func(f"Folder isn't empty.  Skipping Folder: {item_name}")
+
+                    except OSError as e:
+
+                        log_func(f"Could not delete folder {item_name}: {e}")
+                    
+                else:
+
+                    log_func(f"Skipping folder: {item_name}")
 
     log_func("...")
-    log_func(f"Scan complete! Total files processed: {file_count} \nTotal files moved: {moved_count} \nTotal folders processed: {folder_count} \nTotal items deleted: {deleted_count}")
+    log_func(f"Scan complete! Total items processed: {item_count} \nTotal items moved: {moved_count} \nTotal items deleted: {deleted_count}")
