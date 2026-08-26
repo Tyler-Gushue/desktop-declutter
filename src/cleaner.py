@@ -1,5 +1,8 @@
 import os
 import shutil
+import hashlib
+
+# Categories that . file types get stored into
 
 CATEGORIES = {
     "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"],
@@ -10,12 +13,36 @@ CATEGORIES = {
     "Code": [".py", ".html", ".css", ".js", ".json"]
 }
 
-def scan_and_clean(folder_path, delete_empty_var, delete_only_var, log_func=print):
+# Function for getting hash of a file
+
+def get_file_hash (filepath):
+
+    hasher = hashlib.md5()
+
+    try:
+
+        with open (filepath, "rb") as f:
+
+            while chunk := f.read(8192):
+
+                hasher.update(chunk)
+
+        return hasher.hexdigest()
+    
+    except (PermissionError, OSError):
+
+        return None
+
+# Function for scanning directory
+
+def scan_and_clean(folder_path, delete_empty_var, delete_only_var, delete_duplicates_var, log_func=print):
 
     if not os.path.exists(folder_path):
 
         log_func("Selected path does not exist.")
         return
+
+    seen_hashes = {}
 
     log_func("...")
 
@@ -32,6 +59,29 @@ def scan_and_clean(folder_path, delete_empty_var, delete_only_var, log_func=prin
             item_count += 1
 
             if os.path.isfile(full_path):
+
+                if delete_duplicates_var :
+
+                    file_hash = get_file_hash(full_path)
+
+                    if file_hash:
+                            
+                            if file_hash in seen_hashes:
+
+                                try:
+
+                                    os.remove(full_path)
+                                    deleted_count += 1
+                                    log_func(f"Deleted duplicate file: {item_name}")
+                                    continue
+                                
+                                except OSError as e:
+
+                                    log_func(f"Could not delete duplicate {item_name}: {e}")
+
+                            else:
+
+                                seen_hashes[file_hash] = full_path
 
                 _, ext = os.path.splitext(item_name)
                 ext = ext.lower()
@@ -62,8 +112,6 @@ def scan_and_clean(folder_path, delete_empty_var, delete_only_var, log_func=prin
 
             elif os.path.isdir(full_path):
 
-                item_count += 1
-
                 if delete_empty_var:
 
                     try:
@@ -92,11 +140,30 @@ def scan_and_clean(folder_path, delete_empty_var, delete_only_var, log_func=prin
 
             if os.path.isfile(full_path):
 
-                log_func(f"Skipping file: {item_name}")
+                if delete_duplicates_var :
+
+                    file_hash = get_file_hash(full_path)
+
+                    if file_hash:
+                            
+                            if file_hash in seen_hashes:
+
+                                try:
+
+                                    os.remove(full_path)
+                                    deleted_count += 1
+                                    log_func(f"Deleted duplicate file: {item_name}")
+                                    continue
+
+                                except OSError as e:
+
+                                    log_func(f"Could not delete duplicate {item_name}: {e}")
+
+                            else:
+
+                                seen_hashes[file_hash] = full_path
 
             elif os.path.isdir(full_path):
-
-                item_count += 1
 
                 if delete_empty_var:
 
@@ -121,4 +188,4 @@ def scan_and_clean(folder_path, delete_empty_var, delete_only_var, log_func=prin
                     log_func(f"Skipping folder: {item_name}")
 
     log_func("...")
-    log_func(f"Scan complete! Total items processed: {item_count} \nTotal items moved: {moved_count} \nTotal items deleted: {deleted_count}")
+    log_func(f"Scan complete! \nTotal items processed: {item_count} \nTotal items moved: {moved_count} \nTotal items deleted: {deleted_count}")

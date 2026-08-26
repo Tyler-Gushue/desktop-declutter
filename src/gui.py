@@ -106,7 +106,7 @@ def start_declutter():
           log_message("Please select a folder first!")
           return
 
-     scan_and_clean(folder_selected, delete_empty_var.get(), delete_only_var.get(), log_message)
+     scan_and_clean(folder_selected, delete_empty_var.get(), delete_only_var.get(), delete_duplicates_var.get(), log_message)
 
 
 
@@ -202,6 +202,33 @@ delete_empty_check = Checkbutton(
 )
 
 delete_empty_check.pack(side=TOP)
+
+# Delete duplicates mode section
+
+delete_duplicates_var = BooleanVar(value=False)
+
+def on_toggle():
+     log_message(f"Delete duplicates was set to: {delete_duplicates_var.get()}")
+
+delete_duplicates_check = Checkbutton(
+
+    options_frame,
+    text="Delete Duplicates",
+    bg=PRIMARY,
+    fg=BG,
+    activebackground=ACCENT,
+    selectcolor=ACCENT,
+    variable=delete_duplicates_var,
+    command=on_toggle,
+    cursor="hand2",
+    relief="flat",
+    anchor="w",       
+    padx=10,
+    pady=5,
+
+)
+
+delete_duplicates_check.pack(side=TOP, fill="x")
 
 # message box section
 

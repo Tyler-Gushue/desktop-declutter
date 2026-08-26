@@ -7,10 +7,11 @@ A lightweight, modern Python desktop application built with Tkinter to automatic
 ## Features
 
 * **One-Click Organization:** Automatically scans top-level files in any selected directory and organizes them into categorized folders (Images, Documents, Media, Code, Archives, Installers, and Other).
-* **Delete Only Mode:** Perform non-destructive scans or targeted removals (e.g., duplicate files, empty directories) without sorting files into subfolders.
+* **Duplicate File Detection & Removal:** Accurate, byte-level content hashing (MD5) to identify and safely delete duplicate files regardless of differing filenames.
+* **Delete Only Mode:** Perform targeted cleanups (e.g., removing duplicates or pruning empty directories) without sorting files into subfolders.
 * **Empty Directory Cleanup:** Safely scans and prunes empty top-level directories post-operation.
-* **Live Action Console:** Embedded real-time log window displaying detailed file movements, skipped files, and operation summaries.
-* **Safety First:** Prevents overwriting duplicate filenames and gracefully skips active system directories.
+* **Live Action Console:** Embedded real-time log window displaying detailed file movements, skipped items, and operation summaries.
+* **Safety First:** Prevents overwriting duplicate filenames and gracefully handles locked or permission-restricted system files.
 * **Modern UI:** Built with a clean, flat aesthetic and dedicated options sidebar.
 
 ---
@@ -21,9 +22,9 @@ The following features are actively in development:
 
 * [x] **Delete Empty Folders:** Post-scan cleanup to safely remove empty top-level subdirectories.
 * [x] **Delete Only Mode:** Bypass category organization to execute targeted deletions and cleanup tasks.
+* [x] **Duplicate File Detection:** Byte-level content hashing (MD5) to identify and isolate duplicate files.
 * [ ] **Custom Category & Extension Editor:** Profile manager saving custom folder rules and file mappings to `settings.json`.
 * [ ] **File Lock Handling:** Graceful error handling for permission-restricted and in-use files (`PermissionError`, `WinError 32`).
-* [ ] **Duplicate File Detection:** Byte-level content hashing (MD5/SHA-256) to identify and isolate duplicate files.
 * [ ] **Undo Action:** Transaction history logging to reverse the last declutter run and restore original file locations.
 * [ ] **Sort by Date:** Optional chronological subfolder sorting based on file creation and modification timestamps.
 * [ ] **Background Execution & Progress Bar:** Offloading scan I/O to a background thread with real-time visual progress tracking.
@@ -34,7 +35,7 @@ The following features are actively in development:
 
 * **Language:** Python 3.x
 * **GUI Framework:** Tkinter
-* **File Management:** Standard Library (`os`, `shutil`, `pathlib`)
+* **File Management & Hashing:** Standard Library (`os`, `shutil`, `hashlib`, `pathlib`)
 * **Executable Build:** PyInstaller
 
 ---
