@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import filedialog, messagebox, scrolledtext
 from tkinter.ttk import Progressbar, Style
 import threading
-from cleaner import scan_and_clean
+from cleaner import scan_and_clean, undo_last_declutter
 
 # --- Color Palette Constants ---
 
@@ -100,6 +100,8 @@ path_label.pack(side=LEFT)
 
 # Start button section
 
+last_moved_history = []
+
 def start_declutter():
 
      if folder_selected == "No folder was selected":
@@ -112,7 +114,8 @@ def start_declutter():
 
      def run_scan():
 
-          scan_and_clean(
+          global last_moved_history
+          last_moved_history = scan_and_clean(
                folder_selected, 
                delete_empty_var.get(), 
                delete_only_var.get(), 
@@ -122,6 +125,9 @@ def start_declutter():
           )
 
           start_btn.config(state="normal")
+
+          if last_moved_history:
+                    undo_btn.config(state="normal", bg="#999999", cursor="hand2")
 
      threading.Thread(target=run_scan, daemon=True).start()
 
@@ -136,6 +142,7 @@ start_btn = Button(
      bg=PRIMARY,
      fg="white",
      activebackground=ACCENT,
+     activeforeground="white",
      relief="flat",
      padx=20,
      pady=10,
@@ -143,7 +150,50 @@ start_btn = Button(
 
 )
 
-start_btn.pack(fill="x", pady=20)
+start_btn.pack(fill="x", pady=(15, 3))
+
+# section for undo button
+
+def undo_declutter():
+
+     global last_moved_history
+
+     if not last_moved_history:
+          return
+
+     start_btn.config(state="disabled")
+     undo_btn.config(state="disabled", bg="#cccccc", cursor="")
+     progress_bar["value"] = 0
+
+     def run_undo():
+
+          global last_moved_history
+          undo_last_declutter(folder_selected, last_moved_history, log_message, update_progress)
+          last_moved_history=[]
+          start_btn.config(state="normal")
+
+     threading.Thread(target=run_undo, daemon=True).start()
+
+
+
+undo_btn = Button(
+
+     window,
+     text="Undo Sort",
+     font=("Arial Bold", 12),
+     command=undo_declutter,
+     bg="#cccccc",
+     fg="white",
+     activebackground="#999999",
+     activeforeground="white",
+     relief="flat",
+     padx=20,
+     pady=10,
+     state="disabled"
+
+)
+
+undo_btn.pack(fill="x", pady=(3, 15))
 
 # section for progress bar
 
