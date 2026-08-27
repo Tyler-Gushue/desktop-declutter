@@ -35,7 +35,7 @@ def get_file_hash (filepath):
 
 # Function for scanning directory
 
-def scan_and_clean(folder_path, delete_empty_var, delete_only_var, delete_duplicates_var, log_func=print):
+def scan_and_clean(folder_path, delete_empty_var, delete_only_var, delete_duplicates_var, log_func=print, progress_callback=None):
 
     if not os.path.exists(folder_path):
 
@@ -50,9 +50,16 @@ def scan_and_clean(folder_path, delete_empty_var, delete_only_var, delete_duplic
     moved_count = 0
     deleted_count = 0
 
-    for item_name in os.listdir(folder_path):
+    items = os.listdir(folder_path)
+    total_items = len(items)
+
+    for index, item_name in enumerate(items, start=1):
 
         full_path = os.path.join(folder_path, item_name)
+
+        if progress_callback:
+
+            progress_callback(index, total_items)
 
         if not delete_only_var:
 
