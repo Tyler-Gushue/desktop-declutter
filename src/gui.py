@@ -1,7 +1,8 @@
 import os
 from tkinter import *
 from tkinter import filedialog, messagebox, scrolledtext
-from tkinter.ttk import Progressbar
+from tkinter.ttk import Progressbar, Style
+import threading
 from cleaner import scan_and_clean
 
 # --- Color Palette Constants ---
@@ -106,14 +107,30 @@ def start_declutter():
           log_message("Please select a folder first!")
           return
 
-     scan_and_clean(folder_selected, delete_empty_var.get(), delete_only_var.get(), delete_duplicates_var.get(), log_message)
+     start_btn.config(state="disabled")
+     progress_bar["value"] = 0
+
+     def run_scan():
+
+          scan_and_clean(
+               folder_selected, 
+               delete_empty_var.get(), 
+               delete_only_var.get(), 
+               delete_duplicates_var.get(), 
+               log_message, 
+               update_progress
+          )
+
+          start_btn.config(state="normal")
+
+     threading.Thread(target=run_scan, daemon=True).start()
 
 
 
 start_btn = Button(
 
      window,
-     text="Start Declutter",
+     text="Start Scan",
      font=("Arial Bold", 12),
      command=start_declutter,
      bg=PRIMARY,
@@ -127,6 +144,36 @@ start_btn = Button(
 )
 
 start_btn.pack(fill="x", pady=20)
+
+# section for progress bar
+
+def update_progress(current_item: int, total_items: int):
+    
+    progress_bar["maximum"] = total_items
+    progress_bar["value"] = current_item
+
+style = Style()
+style.theme_use("clam")
+
+style.configure(
+    "Custom.Horizontal.TProgressbar",
+    troughcolor=BG,
+    background=ACCENT,
+    bordercolor="#f0f4f3",
+    lightcolor=ACCENT,
+    darkcolor=ACCENT,
+)
+
+progress_bar = Progressbar (
+
+     window,
+     orient="horizontal",
+     mode="determinate",
+     style="Custom.Horizontal.TProgressbar"
+
+)
+
+progress_bar.pack(fill="x", pady=(0, 10))
 
 # section for creating bottom frame
 
