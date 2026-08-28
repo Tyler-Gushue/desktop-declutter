@@ -1,7 +1,7 @@
 import os
 from tkinter import *
 from tkinter import filedialog, messagebox, scrolledtext
-from tkinter.ttk import Progressbar, Style
+from tkinter.ttk import Progressbar, Style, Combobox, Treeview
 import threading
 from cleaner import scan_and_clean, undo_last_declutter
 
@@ -97,6 +97,166 @@ path_label = Label(
 )
 
 path_label.pack(side=LEFT)
+
+# Preset Selection Section
+
+preset_frame = Frame(window, bg=BG)
+preset_frame.pack(fill="x", pady=(0, 15))
+
+preset_label = Label(
+
+    preset_frame,
+    text="Sorting Preset:",
+    font=("Arial Bold", 10),
+    bg=BG,
+    fg=TEXT
+
+)
+
+preset_label.pack(side=LEFT, padx=(0, 10))
+
+
+current_preset_var = StringVar(value="Default")
+
+preset_dropdown = Combobox(
+    preset_frame,
+    textvariable=current_preset_var,
+    values=["Default"],
+    state="readonly",
+    width=22,
+    font=("Arial", 10)
+)
+
+preset_dropdown.pack(side=LEFT, fill="x", expand=True, padx=(0, 10))
+
+def on_preset_change(event):
+    
+    log_message(f"Active preset changed to: {current_preset_var.get()}")
+
+preset_dropdown.bind("<<ComboboxSelected>>", on_preset_change)
+
+def open_manage_presets():
+    open_preset_manager_modal(window)
+
+def open_preset_manager_modal(parent):
+    
+    modal = Toplevel(parent)
+    modal.title("Manage Presets")
+    modal.geometry("520x420")
+    modal.config(padx=20, pady=20, bg=BG)
+    modal.resizable(False, False)
+    modal.transient(parent)
+    modal.grab_set()
+
+    header_frame = Frame(modal, bg=BG)
+    header_frame.pack(fill="x", pady=(0, 15))
+
+    Label(
+         
+        header_frame,
+        text="Manage Presets",
+        font=("Arial Bold", 16),
+        bg=BG,
+        fg=TEXT
+
+    ).pack(side=LEFT)
+
+    Button(
+         
+        header_frame,
+        text="+ New Preset",
+        bg=PRIMARY,
+        fg="white",
+        activebackground=ACCENT,
+        relief="flat",
+        padx=10,
+        pady=4,
+        font=("Arial Bold", 9),
+        cursor="hand2"
+
+    ).pack(side=RIGHT)
+
+    list_container = Frame(modal, bg=BG)
+    list_container.pack(fill="both", expand=True, pady=(0, 15))
+
+    def render_preset_row(name, is_default=False):
+        
+        row = Frame(list_container, bg="#f0f4f3", padx=12, pady=10)
+        row.pack(fill="x", pady=4)
+
+        Label(
+             
+            row,
+            text=name,
+            font=("Segoe UI Bold", 10),
+            bg="#f0f4f3",
+            fg=TEXT
+
+        ).pack(side=LEFT)
+
+        if not is_default:
+            
+            Button(
+                 
+                row,
+                text="Delete",
+                bg="#e07a5f",
+                fg="white",
+                relief="flat",
+                padx=8,
+                pady=2,
+                cursor="hand2",
+                font=("Segoe UI", 9)
+
+            ).pack(side=RIGHT, padx=(6, 0))
+
+        Button(
+             
+            row,
+            text="Edit Categories",
+            bg=PRIMARY,
+            fg="white",
+            relief="flat",
+            padx=8,
+            pady=2,
+            cursor="hand2",
+            font=("Segoe UI", 9)
+
+        ).pack(side=RIGHT)
+
+    render_preset_row("Default", is_default=True)
+    render_preset_row("School Projects")
+    render_preset_row("Media & Assets")
+
+    Button(
+        modal,
+        text="Close",
+        command=modal.destroy,
+        bg="#999999",
+        fg="White",
+        relief="flat",
+        padx=15,
+        pady=8,
+        cursor="hand2"
+    ).pack(side=BOTTOM, fill="x")
+
+manage_btn = Button(
+
+    preset_frame,
+    text="⚙ Manage Presets",
+    command=open_manage_presets,
+    bg=PRIMARY,
+    fg="white",
+    activebackground=ACCENT,
+    relief="flat",
+    padx=10,
+    pady=3,
+    cursor="hand2",
+    font=("Arial Bold", 9)
+
+)
+
+manage_btn.pack(side=RIGHT)
 
 # Start button section
 
