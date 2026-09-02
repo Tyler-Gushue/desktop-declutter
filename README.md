@@ -7,27 +7,29 @@ A lightweight, modern Python desktop application built with Tkinter to automatic
 ## Features
 
 * **One-Click Organization:** Automatically scans top-level files in any selected directory and organizes them into categorized folders (Images, Documents, Media, Code, Archives, Installers, and Other).
+* **Custom Preset & Category Management:** Create, edit, and delete custom sorting profiles. Define target directory names, add/remove file extensions, and resolve extension collisions automatically.
+* **Persistent Configuration:** User presets, target folders, and custom rules automatically persist across application sessions via `config.json`.
 * **Duplicate File Detection & Removal:** Accurate, byte-level content hashing (MD5) to identify and safely delete duplicate files regardless of differing filenames.
 * **Delete Only Mode:** Perform targeted cleanups (e.g., removing duplicates or pruning empty directories) without sorting files into subfolders.
 * **Empty Directory Cleanup:** Safely scans and prunes empty top-level directories post-operation.
-* **Undo Sort Action:** One-click transaction history reversal to restore moved files back to their original root locations and clean up newly empty category folders.
+* **Undo Sort Action:** One-click transaction history reversal to restore moved files back to their original root locations and clean up newly empty category folders matching the active preset.
 * **Threaded Background Execution & Progress Bar:** Offloads scan and undo I/O to background daemon threads with real-time visual progress tracking to prevent UI lockups.
 * **Live Action Console:** Embedded real-time log window displaying detailed file movements, skipped items, and operation summaries.
 * **Safety First:** Prevents overwriting duplicate filenames and gracefully handles locked or permission-restricted system files.
-* **Modern UI:** Built with a clean, flat aesthetic and dedicated options sidebar.
+* **Modern UI:** Built with a clean, flat aesthetic, dedicated options sidebar, and modal configuration dialogs.
 
 ---
 
 ## Planned Features & Roadmap
 
-The following features are actively in development:
+The following features and milestones:
 
 * [x] **Delete Empty Folders:** Post-scan cleanup to safely remove empty top-level subdirectories.
 * [x] **Delete Only Mode:** Bypass category organization to execute targeted deletions and cleanup tasks.
 * [x] **Duplicate File Detection:** Byte-level content hashing (MD5) to identify and isolate duplicate files.
 * [x] **Background Execution & Progress Bar:** Offloading scan I/O to a background thread with real-time visual progress tracking.
 * [x] **Undo Action:** Transaction history logging to reverse the last declutter run and restore original file locations.
-* [ ] **Custom Category & Extension Editor:** Profile manager saving custom folder rules and file mappings to `settings.json`.
+* [x] **Custom Preset & Category Editor:** Profile manager saving custom folder rules and file mappings to `config.json`.
 * [ ] **File Lock Handling:** Graceful error handling for permission-restricted and in-use files (`PermissionError`, `WinError 32`).
 * [ ] **Sort by Date:** Optional chronological subfolder sorting based on file creation and modification timestamps.
 
@@ -38,7 +40,7 @@ The following features are actively in development:
 * **Language:** Python 3.x
 * **GUI Framework:** Tkinter / ttk
 * **Concurrency:** `threading`
-* **File Management & Hashing:** Standard Library (`os`, `shutil`, `hashlib`, `pathlib`)
+* **File Management & Hashing:** Standard Library (`os`, `shutil`, `hashlib`, `json`)
 * **Executable Build:** PyInstaller
 
 ---
