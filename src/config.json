@@ -1,0 +1,104 @@
+{
+  "settings": {
+    "never_show_again_delete_prompt": false
+  },
+  "presets": {
+    "Default": {
+      "sort_uncategorized_to_other": true,
+      "categories": {
+        "Images": [
+          ".jpg",
+          ".jpeg",
+          ".png",
+          ".gif",
+          ".webp"
+        ],
+        "Documents": [
+          ".pdf",
+          ".docx",
+          ".doc",
+          ".txt",
+          ".xlsx"
+        ],
+        "Media": [
+          ".mp4",
+          ".mov",
+          ".mp3",
+          ".wav"
+        ],
+        "Archives": [
+          ".zip",
+          ".rar",
+          ".7z",
+          ".tar"
+        ],
+        "Code": [
+          ".py",
+          ".js",
+          ".html",
+          ".css",
+          ".json"
+        ]
+      }
+    },
+    "School Projects": {
+      "sort_uncategorized_to_other": true,
+      "categories": {
+        "Assignments": [
+          ".pdf",
+          ".docx",
+          ".txt"
+        ],
+        "Presentations": [
+          ".pptx",
+          ".key"
+        ],
+        "Code": [
+          ".py",
+          ".java",
+          ".cpp",
+          ".sql"
+        ]
+      }
+    },
+    "Media & Assets": {
+      "sort_uncategorized_to_other": true,
+      "categories": {
+        "Graphics": [
+          ".png",
+          ".jpg",
+          ".svg",
+          ".psd",
+          ".pub",
+          ".xlsx",
+          ".accdb"
+        ],
+        "Audio": [
+          ".mp3",
+          ".wav",
+          ".flac",
+          ".bmp"
+        ],
+        "Video": [
+          ".mp4",
+          ".mov",
+          ".mkv"
+        ]
+      }
+    },
+    "Example": {
+      "sort_uncategorized_to_other": true,
+      "categories": {
+        "Documents": [
+          ".pdf",
+          ".txt",
+          ".docx"
+        ],
+        "Images": [],
+        "somthing": [
+          ".jpg"
+        ]
+      }
+    }
+  }
+}
