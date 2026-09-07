@@ -2,6 +2,8 @@
 
 A lightweight, modern Python desktop application built with Tkinter to automatically organize cluttered directories into clean, categorized folders by file type.
 
+![Desktop Declutter Demo](assets/demo.gif)
+
 ---
 
 ## Features
