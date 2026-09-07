@@ -1,6 +1,6 @@
 {
   "settings": {
-    "never_show_again_delete_prompt": false
+    "never_show_again_delete_prompt": true
   },
   "presets": {
     "Default": {
