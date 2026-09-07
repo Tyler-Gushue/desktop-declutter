@@ -14,7 +14,7 @@ SECONDARY = "#97d9ca"
 ACCENT = "#71d8c1"
 TEXT = "#070908"
 
-# --- JSON Configuration & Persistence ---
+# --- Configuration & State Persistence ---
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(script_dir, "config.json")
@@ -72,11 +72,10 @@ def save_config(data):
     except Exception as e:
         print(f"Error saving config.json: {e}")
 
-# Load persistent config state
 app_config = load_config()
 app_presets = app_config["presets"]
 
-# Creates default window dimensions and titles it
+# --- Main Application Window ---
 
 window = Tk()
 window.title("Desktop Declutter")
@@ -84,7 +83,7 @@ window.geometry("750x750")
 window.config(padx=20, pady=20, bg=BG)
 window.resizable(False, False)
 
-# Sets logo
+# --- Application Icon ---
 
 logo_path = os.path.join(script_dir, "Logo.png")
 
@@ -94,7 +93,7 @@ try:
 except Exception as e:
     print(f"Could not load icon: {e}")
 
-# Creates label of application
+# --- Header Title ---
 
 lbl = Label(
     window,
@@ -105,7 +104,7 @@ lbl = Label(
 )
 lbl.pack(pady=20)
 
-# Section for selecting a folder to declutter
+# --- Folder Selection ---
 
 folder_selected = "No folder was selected"
 
@@ -143,7 +142,7 @@ path_label = Label(
 )
 path_label.pack(side=LEFT)
 
-# --- Preset Selection Section ---
+# --- Preset Selection ---
 
 preset_frame = Frame(window, bg=BG)
 preset_frame.pack(fill="x", pady=(0, 15))
@@ -315,7 +314,7 @@ manage_btn = Button(
 )
 manage_btn.pack(side=RIGHT)
 
-# --- Preset -> Categories & Extensions Modal ---
+# --- Category & Extension Editor ---
 
 def open_manage_categories(preset_name="Default"):
     open_categories_manager_modal(window, preset_name)
@@ -329,7 +328,6 @@ def open_categories_manager_modal(parent, preset_name):
     modal.transient(parent)
     modal.grab_set()
 
-    # Header Bar showing Preset Title
     header_frame = Frame(modal, bg=BG)
     header_frame.pack(fill="x", pady=(0, 10))
 
@@ -378,7 +376,6 @@ def open_categories_manager_modal(parent, preset_name):
         cursor="hand2"
     ).pack(side=RIGHT)
 
-    # Categories List Container
     cat_list_frame = Frame(modal, bg=BG)
     cat_list_frame.pack(fill="both", expand=True, pady=(10, 10))
 
@@ -391,60 +388,57 @@ def open_categories_manager_modal(parent, preset_name):
             render_category_row(cat_name, extensions)
 
     def edit_extensions(category_name):
-            curr_exts = ", ".join(app_presets[preset_name]["categories"].get(category_name, []))
-            user_input = simpledialog.askstring(
-                f"Edit Extensions - {category_name}",
-                f"Enter comma-separated extensions for {category_name}:\n(e.g., .png, .jpg, .svg)",
-                initialvalue=curr_exts,
+        curr_exts = ", ".join(app_presets[preset_name]["categories"].get(category_name, []))
+        user_input = simpledialog.askstring(
+            f"Edit Extensions - {category_name}",
+            f"Enter comma-separated extensions for {category_name}:\n(e.g., .png, .jpg, .svg)",
+            initialvalue=curr_exts,
+            parent=modal
+        )
+        if user_input is None:
+            return
+
+        raw_items = [e.strip().lower() for e in user_input.split(",") if e.strip()]
+        new_exts = []
+        for ext in raw_items:
+            if not ext.startswith("."):
+                ext = "." + ext
+            if ext not in new_exts:
+                new_exts.append(ext)
+
+        all_categories = app_presets[preset_name]["categories"]
+        conflicts = {}
+
+        for ext in new_exts:
+            for other_cat, exts_list in all_categories.items():
+                if other_cat != category_name and ext in exts_list:
+                    conflicts[ext] = other_cat
+
+        if conflicts:
+            conflict_details = "\n".join([f"• {ext} (currently in '{cat}')" for ext, cat in conflicts.items()])
+            reassign = messagebox.askyesnocancel(
+                "Duplicate Extensions Detected",
+                f"The following extension(s) are already used in other categories:\n\n"
+                f"{conflict_details}\n\n"
+                f"• Click 'Yes' to reassign them to '{category_name}'.\n"
+                f"• Click 'No' to keep them in their original folders and skip adding them here.\n"
+                f"• Click 'Cancel' to abort.",
                 parent=modal
             )
-            if user_input is None:
+
+            if reassign is None:
                 return
 
-            raw_items = [e.strip().lower() for e in user_input.split(",") if e.strip()]
-            new_exts = []
-            for ext in raw_items:
-                if not ext.startswith("."):
-                    ext = "." + ext
-                if ext not in new_exts:
-                    new_exts.append(ext)
+            if reassign:
+                for ext, other_cat in conflicts.items():
+                    if ext in all_categories[other_cat]:
+                        all_categories[other_cat].remove(ext)
+            else:
+                new_exts = [ext for ext in new_exts if ext not in conflicts]
 
-            # Check for conflicts across other categories in the same preset
-            all_categories = app_presets[preset_name]["categories"]
-            conflicts = {}  # {ext: other_category_name}
-
-            for ext in new_exts:
-                for other_cat, exts_list in all_categories.items():
-                    if other_cat != category_name and ext in exts_list:
-                        conflicts[ext] = other_cat
-
-            if conflicts:
-                conflict_details = "\n".join([f"• {ext} (currently in '{cat}')" for ext, cat in conflicts.items()])
-                reassign = messagebox.askyesnocancel(
-                    "Duplicate Extensions Detected",
-                    f"The following extension(s) are already used in other categories:\n\n"
-                    f"{conflict_details}\n\n"
-                    f"• Click 'Yes' to reassign them to '{category_name}'.\n"
-                    f"• Click 'No' to keep them in their original folders and skip adding them here.\n"
-                    f"• Click 'Cancel' to abort.",
-                    parent=modal
-                )
-
-                if reassign is None:
-                    return  # Abort edit
-
-                if reassign:
-                    # Remove conflicting extensions from their old categories
-                    for ext, other_cat in conflicts.items():
-                        if ext in all_categories[other_cat]:
-                            all_categories[other_cat].remove(ext)
-                else:
-                    # Discard conflicting extensions from being added here
-                    new_exts = [ext for ext in new_exts if ext not in conflicts]
-
-            app_presets[preset_name]["categories"][category_name] = new_exts
-            save_config(app_config)
-            refresh_categories()
+        app_presets[preset_name]["categories"][category_name] = new_exts
+        save_config(app_config)
+        refresh_categories()
 
     def delete_category(category_name):
         if messagebox.askyesno("Delete Directory", f"Remove folder category '{category_name}'?", parent=modal):
@@ -506,7 +500,6 @@ def open_categories_manager_modal(parent, preset_name):
 
     refresh_categories()
 
-    # Sort Uncategorized Checkbox
     sort_other_var = BooleanVar(value=app_presets[preset_name].get("sort_uncategorized_to_other", True))
 
     def on_toggle_other():
@@ -539,7 +532,103 @@ def open_categories_manager_modal(parent, preset_name):
         cursor="hand2"
     ).pack(side=BOTTOM, fill="x")
 
-# Start button section
+# --- Deletion Confirmation Warning Modal ---
+
+def confirm_deletion_action():
+    if app_config.get("settings", {}).get("never_show_again_delete_prompt", False):
+        return True
+
+    confirmed = False
+    prompt = Toplevel(window)
+    prompt.title("Warning: Permanent Action")
+    prompt.geometry("450x230")
+    prompt.config(padx=20, pady=15, bg=BG)
+    prompt.resizable(False, False)
+    prompt.transient(window)
+    prompt.grab_set()
+
+    Label(
+        prompt,
+        text="⚠️ Warning: Permanent File Deletion",
+        font=("Arial Bold", 13),
+        bg=BG,
+        fg="#e07a5f"
+    ).pack(anchor="w", pady=(0, 10))
+
+    warning_text = (
+        "You have enabled features that permanently delete files or folders "
+        "(e.g., Duplicates or Empty Folders). These operations cannot be undone.\n\n"
+        "Do you want to proceed?"
+    )
+    Label(
+        prompt,
+        text=warning_text,
+        font=("Segoe UI", 9),
+        bg=BG,
+        fg=TEXT,
+        wraplength=410,
+        justify="left"
+    ).pack(anchor="w", pady=(0, 10))
+
+    never_show_var = BooleanVar(value=False)
+    Checkbutton(
+        prompt,
+        text="Don't show this prompt in the future",
+        variable=never_show_var,
+        bg=BG,
+        fg=TEXT,
+        activebackground=BG,
+        selectcolor="white",
+        font=("Segoe UI", 9),
+        cursor="hand2"
+    ).pack(anchor="w", pady=(0, 15))
+
+    btn_frame = Frame(prompt, bg=BG)
+    btn_frame.pack(fill="x")
+
+    def on_continue():
+        nonlocal confirmed
+        confirmed = True
+        if never_show_var.get():
+            if "settings" not in app_config:
+                app_config["settings"] = {}
+            app_config["settings"]["never_show_again_delete_prompt"] = True
+            save_config(app_config)
+        prompt.destroy()
+
+    def on_cancel():
+        prompt.destroy()
+
+    Button(
+        btn_frame,
+        text="Continue",
+        command=on_continue,
+        bg="#e07a5f",
+        fg="white",
+        relief="flat",
+        padx=14,
+        pady=5,
+        cursor="hand2",
+        font=("Segoe UI Bold", 9)
+    ).pack(side=RIGHT, padx=(8, 0))
+
+    Button(
+        btn_frame,
+        text="Cancel",
+        command=on_cancel,
+        bg="#999999",
+        fg="white",
+        relief="flat",
+        padx=14,
+        pady=5,
+        cursor="hand2",
+        font=("Segoe UI", 9)
+    ).pack(side=RIGHT)
+
+    window.wait_window(prompt)
+    return confirmed
+
+# --- Scan Execution ---
 
 last_moved_history = []
 
@@ -547,6 +636,17 @@ def start_declutter():
     if folder_selected == "No folder was selected":
         log_message("Please select a folder first!")
         return
+
+    has_delete_action = (
+        delete_duplicates_var.get() or 
+        delete_empty_var.get() or 
+        delete_only_var.get()
+    )
+
+    if has_delete_action:
+        if not confirm_deletion_action():
+            log_message("Operation cancelled by user.")
+            return
 
     start_btn.config(state="disabled")
     progress_bar["value"] = 0
@@ -566,10 +666,8 @@ def start_declutter():
             progress_callback=update_progress
         )
 
-        # Re-enable start button when finished
         start_btn.config(state="normal")
 
-        # Enable undo button if files were moved
         if last_moved_history:
             undo_btn.config(state="normal", bg="#999999", cursor="hand2")
 
@@ -591,7 +689,7 @@ start_btn = Button(
 )
 start_btn.pack(fill="x", pady=(15, 3))
 
-# section for undo button
+# --- Undo Execution ---
 
 def undo_declutter():
     global last_moved_history
@@ -604,19 +702,19 @@ def undo_declutter():
     progress_bar["value"] = 0
 
     def run_undo():
-            global last_moved_history
-            active_preset_name = current_preset_var.get()
-            preset_info = app_presets.get(active_preset_name, app_presets.get("Default"))
+        global last_moved_history
+        active_preset_name = current_preset_var.get()
+        preset_info = app_presets.get(active_preset_name, app_presets.get("Default"))
 
-            undo_last_declutter(
-                folder_selected, 
-                last_moved_history, 
-                preset_data=preset_info, 
-                log_func=log_message, 
-                progress_callback=update_progress
-            )
-            last_moved_history = []
-            start_btn.config(state="normal")
+        undo_last_declutter(
+            folder_selected, 
+            last_moved_history, 
+            preset_data=preset_info, 
+            log_func=log_message, 
+            progress_callback=update_progress
+        )
+        last_moved_history = []
+        start_btn.config(state="normal")
 
     threading.Thread(target=run_undo, daemon=True).start()
 
@@ -636,7 +734,7 @@ undo_btn = Button(
 )
 undo_btn.pack(fill="x", pady=(3, 15))
 
-# section for progress bar
+# --- Progress Bar ---
 
 def update_progress(current_item: int, total_items: int):
     progress_bar["maximum"] = total_items
@@ -662,17 +760,15 @@ progress_bar = Progressbar(
 )
 progress_bar.pack(fill="x", pady=(0, 10))
 
-# section for creating bottom frame
+# --- Bottom Frame Container ---
 
 bottom_frame = Frame(window)
 bottom_frame.pack(pady=20, fill="both", expand=True)
 
-# section for creating options frame
+# --- Options Sidebar ---
 
 options_frame = Frame(bottom_frame)
 options_frame.pack(side=LEFT, fill="y", pady=20)
-
-# section for options label
 
 options_label = Label(
     options_frame,
@@ -682,7 +778,7 @@ options_label = Label(
 )
 options_label.pack(pady=20)
 
-# Delete only mode section
+# --- Option: Delete Only Mode ---
 
 delete_only_var = BooleanVar(value=False)
 
@@ -706,7 +802,7 @@ delete_only_check = Checkbutton(
 )
 delete_only_check.pack(side=TOP, fill="x")
 
-# Delete empty folders section
+# --- Option: Delete Empty Folders ---
 
 delete_empty_var = BooleanVar(value=False)
 
@@ -729,7 +825,7 @@ delete_empty_check = Checkbutton(
 )
 delete_empty_check.pack(side=TOP)
 
-# Delete duplicates mode section
+# --- Option: Delete Duplicates ---
 
 delete_duplicates_var = BooleanVar(value=False)
 
@@ -753,7 +849,7 @@ delete_duplicates_check = Checkbutton(
 )
 delete_duplicates_check.pack(side=TOP, fill="x")
 
-# message box section
+# --- Action Console Log ---
 
 msg_box = scrolledtext.ScrolledText(
     bottom_frame,
@@ -774,10 +870,8 @@ def log_message(message: str):
     msg_box.see(END)
     msg_box.config(state="disabled")
 
-# Set initial message and lock the box
-
 log_message("Select a folder to get started")
 
-# Keeps window opened
+# --- Event Loop ---
 
 window.mainloop()
